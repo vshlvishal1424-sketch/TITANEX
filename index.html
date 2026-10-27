@@ -111,6 +111,44 @@ input,select{background:white;color:#111;border-color:#ccc}
 </style>
 </head>
 <body>
+ <section id="loginScreen">
+  <div class="login-box">
+    <h1><span style="color:#b88aff">TITAN</span>EX</h1>
+    <p>Smart Car Sales Dashboard</p>
+
+    <div class="field">
+      <label for="loginEmail">Email Address</label>
+      <input
+        id="loginEmail"
+        type="email"
+        placeholder="Enter your email"
+        autocomplete="email"
+      >
+    </div>
+
+    <div class="field">
+      <label for="loginPassword">Password</label>
+      <input
+        id="loginPassword"
+        type="password"
+        placeholder="Enter your password"
+        autocomplete="current-password"
+      >
+    </div>
+
+    <button id="loginButton" type="button">LOGIN</button>
+
+    <button id="createAccountButton" class="secondary" type="button">
+      CREATE ACCOUNT
+    </button>
+
+    <button id="forgotPasswordButton" class="secondary" type="button">
+      FORGOT PASSWORD?
+    </button>
+
+    <div id="loginMessage" role="status"></div>
+  </div>
+ </section>
 
 <header>
  <div class="wrap top">
