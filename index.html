@@ -111,6 +111,15 @@ footer{text-align:center;color:#777;margin-top:25px;font-size:12px}
 <label>Ex-showroom Price</label>
 <input id="ex" type="number" value="700000" min="0">
 
+  <label>GST Percentage (%)</label>
+<input id="gst" type="number" value="0" min="0" max="100" step="0.1">
+
+<label>Ex-showroom price already includes GST?</label>
+<select id="gstIncluded">
+  <option value="yes" selected>Yes — GST already included</option>
+  <option value="no">No — Add GST separately</option>
+</select>
+
 <div class="grid">
   <div>
     <label>RTO / Registration</label>
@@ -139,6 +148,10 @@ footer{text-align:center;color:#777;margin-top:25px;font-size:12px}
 </div>
 
 <div class="result"><span>Ex-showroom</span><b id="showEx">₹0</b></div>
+  <div class="result">
+  <span>GST Amount</span>
+  <b id="showGST">₹0</b>
+  </div>
 <div class="result"><span>RTO / Registration</span><b id="showRto">₹0</b></div>
 <div class="result"><span>Insurance</span><b id="showInsurance">₹0</b></div>
 <div class="result"><span>Warranty + Accessories + Other</span><b id="showExtras">₹0</b></div>
@@ -204,12 +217,39 @@ const $ = id => document.getElementById(id);
 const money = n => "₹" + Math.round(n).toLocaleString("en-IN");
 const num = id => Math.max(0, Number($(id).value) || 0);
 
-function calculate(){
+function calculate(){ function calculate(){
+
+  $("showEx").textContent = money(ex);
+  $("showGST").textContent = money(gstAmount);
+  
+}
   const ex = num("ex");
-  const rto = num("rto");
-  const insurance = num("insurance");
-  const extras = num("warranty") + num("accessories") + num("other");
-  const discount = num("discount");
+const rto = num("rto");
+const insurance = num("insurance");
+const extras = num("warranty") + num("accessories") + num("other");
+const discount = num("discount");
+
+const gstRate = num("gst");
+const gstIncluded = $("gstIncluded").value === "yes";
+
+let gstAmount = 0;
+let priceAfterGST = ex;
+
+if (gstRate > 0) {
+  if (gstIncluded) {
+    // GST already included: calculate the GST component
+    gstAmount = ex * gstRate / (100 + gstRate);
+  } else {
+    // GST not included: add GST to the entered taxable price
+    gstAmount = ex * gstRate / 100;
+    priceAfterGST = ex + gstAmount;
+  }
+}
+
+const onroad = Math.max(
+  0,
+  priceAfterGST + rto + insurance + extras - discount
+);
 
   const onroad = Math.max(0, ex + rto + insurance + extras - discount);
   const down = Math.min(onroad, num("down"));
@@ -243,6 +283,7 @@ function calculate(){
 }
 
 ids.forEach(id => $(id).addEventListener("input", calculate));
+  $("gstIncluded").addEventListener("change", calculate);
 ids.forEach(id => $(id).addEventListener("change", calculate));
 
 function shareWhatsApp(){
