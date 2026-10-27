@@ -430,6 +430,15 @@ const ids = [
   "customer","phone","model","variant","state","ex","rto",
   "insurance","warranty","accessories","other","discount",
   "down","rate","years"
+  ids.forEach(id =>
+  $(id).addEventListener("input", calculate)
+);
+
+ids.forEach(id =>
+  $(id).addEventListener("change", calculate)
+);
+
+calculate();
 ];
 
 const $ = id => document.getElementById(id);
