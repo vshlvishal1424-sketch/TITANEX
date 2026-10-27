@@ -3,622 +3,573 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TITANEX | Car Price & EMI Calculator</title>
-
+<meta name="theme-color" content="#130f25">
+<title>TITANEX | Smart Car Calculations</title>
 <style>
-* {
-  box-sizing: border-box;
+:root{--bg:#0e0c18;--panel:#171427;--field:#201d34;--line:#3b3558;--text:#f7f5ff;--muted:#bcb6d1;--purple:#8b2cff;--purple2:#6124e8;--green:#2dd4a3;--red:#ff6b83}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top right,#241343 0,#0e0c18 45%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{padding:22px 16px 18px;border-bottom:1px solid var(--line);background:#100d1eea;position:sticky;top:0;z-index:3;backdrop-filter:blur(12px)}
+.wrap{max-width:1000px;margin:auto}
+header .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h1{font-size:24px;margin:0;letter-spacing:1.5px}
+h1 span{color:#b88aff}
+header p{margin:5px 0 0;color:var(--muted);font-size:13px}
+button{border:0;border-radius:12px;background:linear-gradient(135deg,var(--purple2),var(--purple));color:white;font-weight:700;padding:12px 15px;cursor:pointer;font-size:14px}
+button.secondary{background:#29233f;border:1px solid var(--line)}
+button.danger{background:#572136;border:1px solid #9d3b5b}
+main{max-width:1000px;margin:20px auto;padding:0 14px 40px;display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+.card{background:linear-gradient(160deg,#19162b,#141120);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 12px 35px #0002;min-width:0}
+.card h2{font-size:18px;margin:0 0 17px;padding:0 0 12px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+label{font-size:13px;color:var(--muted)}
+input,select{width:100%;min-width:0;background:var(--field);color:var(--text);border:1px solid #45405f;border-radius:11px;padding:12px;font-size:15px;outline:none}
+input:focus,select:focus{border-color:#a56aff;box-shadow:0 0 0 2px #8b2cff25}
+.hint{color:var(--muted);font-size:12px;line-height:1.5}
+.results{display:flex;flex-direction:column;gap:0}
+.row{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #302b43;font-size:14px}
+.row span:first-child{color:#d4cee5}
+.row strong{text-align:right;overflow-wrap:anywhere}
+.total{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:16px 0;padding:17px 15px;background:linear-gradient(110deg,#6522dc,#9a2cff);border:1px solid #bd8aff;border-radius:14px;font-size:16px;font-weight:800}
+.emi{font-size:30px;font-weight:850;color:#d5b8ff;margin:4px 0 10px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.actions button{flex:1}
+.note{background:#211a36;border:1px solid #493766;padding:11px 12px;border-radius:12px;color:#d5c9ed;font-size:12px;line-height:1.5;margin-top:12px}
+#status{font-size:12px;color:var(--green);margin-top:10px;min-height:18px}
+.quote-list{display:flex;flex-direction:column;gap:10px}
+.quote-item{border:1px solid var(--line);border-radius:12px;padding:12px;background:#1b172b}
+.quote-item .line{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.quote-item p{margin:6px 0;color:var(--muted);font-size:12px}
+.quote-item button{padding:8px 10px;font-size:12px}
+.hidden{display:none!important}
+footer{text-align:center;color:#89829e;font-size:12px;padding:12px 14px 26px}
+@media(max-width:760px){main{grid-template-columns:1fr;margin-top:13px}.grid{grid-template-columns:1fr 1fr}header{padding:17px 14px}h1{font-size:21px}.card{padding:15px}}
+@media(max-width:400px){.grid{grid-template-columns:1fr}.field.full{grid-column:auto}.total{font-size:14px}}
+@media print{
+body{background:white;color:#111}
+header{position:static;background:white;color:#111;border-color:#ddd}
+header p,.no-print,#authCard,#historyCard,footer{display:none!important}
+main{display:block;max-width:none;margin:0;padding:0}
+.card{background:white;color:#111;border:1px solid #ccc;box-shadow:none;margin-bottom:12px;break-inside:avoid}
+.card h2,.row span:first-child,label,.hint,.note{color:#333}
+.row{border-color:#ddd}
+.total{background:#eee;color:#111;border:1px solid #aaa}
+.emi{color:#111}
+input,select{background:white;color:#111;border-color:#ccc}
 }
-
-body {
-  margin: 0;
-  padding: 20px;
-  min-height: 100vh;
-  font-family: Arial, sans-serif;
-  color: #f5f3ff;
-  background:
-    radial-gradient(ellipse at top, #202052 0%, #0a0a14 65%);
-}
-
-.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 26px;
-  background: rgba(18, 18, 35, 0.96);
-  border: 1px solid #45336b;
-  border-radius: 24px;
-  box-shadow: 0 15px 60px rgba(105, 35, 255, 0.16);
-}
-
-h1 {
-  margin: 5px 0;
-  text-align: center;
-  font-size: clamp(30px, 6vw, 46px);
-  letter-spacing: 5px;
-  color: #c49aff;
-  text-shadow: 0 0 25px rgba(155, 80, 255, 0.4);
-}
-
-.subtitle {
-  margin: 8px 0 30px;
-  text-align: center;
-  color: #a9a5c0;
-  font-size: 13px;
-  letter-spacing: 3px;
-}
-
-h2 {
-  margin-top: 28px;
-  padding: 12px 15px;
-  color: #d3b5ff;
-  font-size: 17px;
-  background: linear-gradient(90deg, #2b1a4b, transparent);
-  border-left: 4px solid #9147ff;
-  border-radius: 8px;
-}
-
-label {
-  display: block;
-  margin: 14px 0 7px;
-  color: #c9c6dc;
-  font-size: 13px;
-}
-
-input,
-select {
-  width: 100%;
-  min-height: 46px;
-  padding: 12px;
-  color: #fff;
-  font-size: 15px;
-  background: #1c1c30;
-  border: 1px solid #414064;
-  border-radius: 11px;
-  outline: none;
-}
-
-input:focus,
-select:focus {
-  border-color: #a66bff;
-  box-shadow: 0 0 0 3px rgba(145, 71, 255, 0.15);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.result {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 10px;
-  color: #d9d6e9;
-  border-bottom: 1px solid #302c45;
-}
-
-.result b {
-  color: #fff;
-  text-align: right;
-}
-
-.total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-top: 18px;
-  padding: 20px;
-  background: linear-gradient(110deg, #5620c9, #902dff);
-  border: 1px solid #b17aff;
-  border-radius: 15px;
-  box-shadow: 0 8px 28px rgba(115, 45, 255, 0.22);
-  font-size: 17px;
-  font-weight: bold;
-}
-
-#onroad {
-  text-align: right;
-  font-size: clamp(18px, 4vw, 26px);
-}
-
-.emi {
-  margin-top: 20px;
-  padding: 25px 15px;
-  background: linear-gradient(135deg, #32175c, #5421a5);
-  border: 1px solid #8f58ff;
-  border-radius: 18px;
-  text-align: center;
-  color: #e7d7ff;
-  box-shadow: 0 8px 30px rgba(112, 44, 255, 0.16);
-}
-
-.emi strong {
-  display: block;
-  margin-top: 12px;
-  color: #fff;
-  font-size: clamp(28px, 6vw, 38px);
-}
-
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 22px;
-}
-
-button {
-  min-height: 48px;
-  padding: 13px;
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
-}
-
-button:active {
-  transform: scale(0.97);
-}
-
-button:hover {
-  filter: brightness(1.12);
-}
-
-.whatsapp {
-  background: #20c975;
-  color: #071d12;
-}
-
-.print {
-  background: linear-gradient(110deg, #a77aff, #d2aaff);
-  color: #20103b;
-}
-
-.note {
-  margin-top: 24px;
-  padding: 14px;
-  color: #aaa5c0;
-  background: #191827;
-  border-radius: 10px;
-  font-size: 12px;
-  line-height: 1.8;
-}
-
-footer {
-  margin-top: 28px;
-  padding-top: 18px;
-  text-align: center;
-  color: #858099;
-  border-top: 1px solid #302c45;
-  font-size: 12px;
-}
-
-@media (max-width: 600px) {
-  body {
-    padding: 10px;
-  }
-
-  .container {
-    padding: 16px;
-    border-radius: 18px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
-  h2 {
-    font-size: 16px;
-  }
-
-  .total {
-    padding: 15px 12px;
-    font-size: 14px;
-  }
-
-  .result {
-    font-size: 13px;
-  }
-
-  .buttons {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media print {
-  body {
-    padding: 0;
-    color: #111;
-    background: white;
-  }
-
-  .container {
-    max-width: none;
-    padding: 10px;
-    color: #111;
-    background: white;
-    border: none;
-    box-shadow: none;
-  }
-
-  h1,
-  h2,
-  .subtitle,
-  .result,
-  .result b,
-  .emi,
-  .emi strong,
-  .note,
-  footer {
-    color: #111;
-    text-shadow: none;
-  }
-
-  input,
-  select {
-    color: #111;
-    background: white;
-    border: 1px solid #ccc;
-  }
-
-  .buttons {
-    display: none;
-  }
-
-  .note {
-    background: white;
-  }
-}
-
 </style>
 </head>
-
 <body>
-<div class="container">
-<h1>TITANEX</h1>
-<div class="subtitle">CAR PRICE & EMI CALCULATOR</div>
 
-<h2>1. Customer Details</h2>
-<label>Customer Name</label>
-<input id="customer" placeholder="Enter customer name">
-
-<label>Customer WhatsApp Number (optional)</label>
-<input id="phone" placeholder="91XXXXXXXXXX" inputmode="numeric">
-
-<h2>2. Car Details</h2>
-<div class="grid">
+<header>
+ <div class="wrap top">
   <div>
-    <label>Car Model</label>
+   <h1><span>TITAN</span>EX</h1>
+   <p>Smart Car Calculations · Sales Quote Desk</p>
+  </div>
+  <button class="secondary" id="authToggle" type="button">Login / Account</button>
+ </div>
+</header>
+
+<main>
+ <section class="card">
+  <h2>1. Customer & Vehicle Details</h2>
+  <div class="grid">
+   <div class="field">
+    <label for="customer">Customer name</label>
+    <input id="customer" placeholder="Customer name" autocomplete="name">
+   </div>
+   <div class="field">
+    <label for="phone">Phone number</label>
+    <input id="phone" inputmode="tel" placeholder="10-digit mobile" autocomplete="tel">
+   </div>
+   <div class="field">
+    <label for="model">Car model</label>
     <select id="model">
-      <option>Swift</option>
-      <option>Baleno</option>
-      <option>Fronx</option>
-      <option>Brezza</option>
-      <option>Dzire</option>
-      <option>Ertiga</option>
-      <option>Grand Vitara</option>
-      <option>Wagon R</option>
-      <option>Alto K10</option>
+     <option value="">Select model</option>
+     <option>Alto K10</option>
+     <option>S-Presso</option>
+     <option>Celerio</option>
+     <option>WagonR</option>
+     <option>Swift</option>
+     <option>Dzire</option>
+     <option>Baleno</option>
+     <option>Ignis</option>
+     <option>Fronx</option>
+     <option>Brezza</option>
+     <option>Ertiga</option>
+     <option>XL6</option>
+     <option>Grand Vitara</option>
+     <option>Jimny</option>
+     <option>Invicto</option>
+     <option>Other</option>
     </select>
-  </div>
-  <div>
-    <label>Variant</label>
-    <select id="variant">
-      <option>LXi</option>
-      <option>VXi</option>
-      <option>ZXi</option>
-      <option>ZXi+</option>
-      <option>Other</option>
+   </div>
+   <div class="field">
+    <label for="variant">Variant</label>
+    <input id="variant" placeholder="e.g. VXi AMT">
+   </div>
+   <div class="field">
+    <label for="state">State / registration location</label>
+    <select id="state">
+     <option>Andhra Pradesh</option>
+     <option>Tamil Nadu</option>
+     <option>Telangana</option>
+     <option>Karnataka</option>
+     <option>Other</option>
     </select>
+   </div>
+   <div class="field">
+    <label for="quoteDate">Quote date</label>
+    <input id="quoteDate" type="date">
+   </div>
   </div>
-</div>
 
-<label>Registration State</label>
-<select id="state">
-  <option>Andhra Pradesh</option>
-  <option>Tamil Nadu</option>
-  <option>Karnataka</option>
-  <option>Other</option>
-</select>
+  <h2 style="margin-top:23px">2. Price Breakdown</h2>
+  <div class="grid">
+   <div class="field">
+    <label for="ex">Ex-showroom price (₹)</label>
+    <input id="ex" type="number" min="0" step="1000" value="0">
+   </div>
+   <div class="field">
+    <label for="gst">GST rate (%)</label>
+    <input id="gst" type="number" min="0" step="0.1" value="0">
+   </div>
+   <div class="field">
+    <label for="gstIncluded">GST treatment</label>
+    <select id="gstIncluded">
+     <option value="yes">Ex-showroom already includes GST</option>
+     <option value="no">Price excludes GST (add it)</option>
+    </select>
+   </div>
+   <div class="field">
+    <label for="rto">RTO / registration (₹)</label>
+    <input id="rto" type="number" min="0" value="0">
+   </div>
+   <div class="field">
+    <label for="insurance">Insurance (₹)</label>
+    <input id="insurance" type="number" min="0" value="0">
+   </div>
+   <div class="field">
+    <label for="warranty">Extended warranty (₹)</label>
+    <input id="warranty" type="number" min="0" value="0">
+   </div>
+   <div class="field">
+    <label for="accessories">Accessories (₹)</label>
+    <input id="accessories" type="number" min="0" value="0">
+   </div>
+   <div class="field">
+    <label for="other">Other charges (₹)</label>
+    <input id="other" type="number" min="0" value="0">
+   </div>
+   <div class="field full">
+    <label for="discount">Discount (₹)</label>
+    <input id="discount" type="number" min="0" value="0">
+   </div>
+  </div>
+  <div class="note">
+   GST note: Car ex-showroom prices generally already include applicable GST.
+   Avoid adding GST twice. Enter the correct GST rate/treatment only after
+   verifying the invoice or dealership pricing.
+  </div>
+ </section>
 
-<h2>3. Price Breakdown (₹)</h2>
-<label>Ex-showroom Price</label>
-<input id="ex" type="number" value="700000" min="0">
+ <section class="card">
+  <h2>3. On-road Price Summary</h2>
+  <div class="results">
+   <div class="row"><span>Ex-showroom</span><strong id="showEx">₹0</strong></div>
+   <div class="row"><span>GST amount</span><strong id="showGST">₹0</strong></div>
+   <div class="row"><span>RTO / Registration</span><strong id="showRto">₹0</strong></div>
+   <div class="row"><span>Insurance</span><strong id="showInsurance">₹0</strong></div>
+   <div class="row"><span>Warranty + Accessories + Other</span><strong id="showExtras">₹0</strong></div>
+   <div class="row"><span>Discount</span><strong id="showDiscount">−₹0</strong></div>
+  </div>
 
-  <label>GST Percentage (%)</label>
-<input id="gst" type="number" value="0" min="0" max="100" step="0.1">
+  <div class="total">
+   <span>ON-ROAD PRICE</span>
+   <span id="onroad">₹0</span>
+  </div>
 
-<label>Ex-showroom price already includes GST?</label>
-<select id="gstIncluded">
-  <option value="yes" selected>Yes — GST already included</option>
-  <option value="no">No — Add GST separately</option>
-</select>
-
-<div class="grid">
-  <div>
-    <label>RTO / Registration</label>
-    <input id="rto" type="number" value="60000" min="0">
-  </div>
-  <div>
-    <label>Insurance</label>
-    <input id="insurance" type="number" value="30000" min="0">
-  </div>
-  <div>
-    <label>Extended Warranty</label>
-    <input id="warranty" type="number" value="0" min="0">
-  </div>
-  <div>
-    <label>Accessories</label>
-    <input id="accessories" type="number" value="0" min="0">
-  </div>
-  <div>
-    <label>Other Charges</label>
-    <input id="other" type="number" value="0" min="0">
-  </div>
-  <div>
-    <label>Discount</label>
-    <input id="discount" type="number" value="0" min="0">
-  </div>
-</div>
-
-<div class="result"><span>Ex-showroom</span><b id="showEx">₹0</b></div>
-  <div class="result">
-  <span>GST Amount</span>
-  <b id="showGST">₹0</b>
-  </div>
-<div class="result"><span>RTO / Registration</span><b id="showRto">₹0</b></div>
-<div class="result"><span>Insurance</span><b id="showInsurance">₹0</b></div>
-<div class="result"><span>Warranty + Accessories + Other</span><b id="showExtras">₹0</b></div>
-<div class="result"><span>Discount</span><b id="showDiscount">−₹0</b></div>
-<div class="total">ON-ROAD PRICE <span id="onroad">₹0</span></div>
-
-<h2>4. Loan & EMI Calculator</h2>
-<label>Down Payment (₹)</label>
-<input id="down" type="number" value="100000" min="0">
-
-<div class="grid">
-  <div>
-    <label>Annual Interest Rate (%)</label>
-    <input id="rate" type="number" value="9" min="0" max="50" step="0.1">
-  </div>
-  <div>
-    <label>Loan Tenure (Years)</label>
+  <h2 style="margin-top:24px">4. Loan & EMI Calculator</h2>
+  <div class="grid">
+   <div class="field">
+    <label for="down">Down payment (₹)</label>
+    <input id="down" type="number" min="0" value="100000">
+   </div>
+   <div class="field">
+    <label for="rate">Annual interest rate (%)</label>
+    <input id="rate" type="number" min="0" step="0.1" value="9">
+   </div>
+   <div class="field full">
+    <label for="years">Loan tenure</label>
     <select id="years">
-      <option value="1">1 Year</option>
-      <option value="2">2 Years</option>
-      <option value="3">3 Years</option>
-      <option value="4">4 Years</option>
-      <option value="5" selected>5 Years</option>
-      <option value="6">6 Years</option>
-      <option value="7">7 Years</option>
+     <option value="1">1 year</option>
+     <option value="2">2 years</option>
+     <option value="3">3 years</option>
+     <option value="4">4 years</option>
+     <option value="5" selected>5 years</option>
+     <option value="6">6 years</option>
+     <option value="7">7 years</option>
     </select>
+   </div>
   </div>
-</div>
 
-<div class="result"><span>Loan Amount</span><b id="loan">₹0</b></div>
-<div class="result"><span>Total Interest</span><b id="interestTotal">₹0</b></div>
-<div class="result"><span>Total Loan Repayment</span><b id="repayment">₹0</b></div>
+  <p class="hint" style="margin:14px 0 2px">Estimated monthly EMI</p>
+  <div class="emi" id="emi">₹0</div>
 
-<div class="emi">
-  ESTIMATED MONTHLY EMI
-  <strong id="emi">₹0</strong>
-</div>
+  <div class="results">
+   <div class="row"><span>Loan amount</span><strong id="loan">₹0</strong></div>
+   <div class="row"><span>Total interest</span><strong id="interestTotal">₹0</strong></div>
+   <div class="row"><span>Total loan repayment</span><strong id="repayment">₹0</strong></div>
+  </div>
 
-<div class="buttons">
-  <button class="whatsapp" onclick="shareWhatsApp()">WhatsApp Quote</button>
-  <button class="print" onclick="window.print()">Print / Save PDF</button>
-</div>
+  <div class="actions no-print">
+   <button id="saveQuote" type="button">Save Quote</button>
+   <button id="whatsapp" type="button" class="secondary">WhatsApp</button>
+   <button id="print" type="button" class="secondary">Print / PDF</button>
+  </div>
+  <div id="status" role="status"></div>
+ </section>
 
-<p class="note">
-  IMPORTANT: Default prices are DEMO values, not official Maruti Suzuki prices.
-  Before sharing a quotation, enter the current dealership price, correct RTO
-  charges and an actual insurance quote. EMI is an estimate; the lender's
-  final interest rate, fees and approval may differ. Confirm all figures
-  with your dealership before promising a customer.
-</p>
+ <section class="card hidden" id="authCard">
+  <h2>5. Email Account</h2>
+  <div class="note" id="authNotice">
+   Firebase setup is needed for secure email login and cloud-saved quotes.
+   Until then, quotes can be saved locally in this browser.
+  </div>
+  <div class="grid" style="margin-top:12px">
+   <div class="field full">
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+   </div>
+   <div class="field full">
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+   </div>
+  </div>
+  <div class="actions">
+   <button id="signIn" type="button">Sign in</button>
+   <button id="signUp" type="button" class="secondary">Create account</button>
+   <button id="signOut" type="button" class="secondary hidden">Sign out</button>
+  </div>
+  <p class="hint">Firebase setup is required before account creation and login will work.</p>
+ </section>
 
-<footer>TITANEX © 2026 | Smart Car Calculations</footer>
-</div>
+ <section class="card" id="historyCard">
+  <h2>6. Saved Quote History</h2>
+  <p class="hint">
+   Local demo mode: quotes stay in this browser on this device.
+   They are not synced between devices until Firebase is configured.
+  </p>
+  <div id="history" class="quote-list">
+   <p class="hint">No saved quotes yet.</p>
+  </div>
+  <div class="actions no-print">
+   <button id="clearHistory" class="danger" type="button">Clear local history</button>
+  </div>
+ </section>
+</main>
+
+<footer>
+ TITANEX © 2026 · Smart Car Calculations · Prices and EMI are estimates.
+ Verify all figures before issuing a final quotation.
+</footer>
 
 <script>
-const ids = [
-  "customer","phone","model","variant","state","ex","rto",
-  "insurance","warranty","accessories","other","discount",
-  "down","rate","years"
-  ids.forEach(id =>
-  $(id).addEventListener("input", calculate)
-);
-
-ids.forEach(id =>
-  $(id).addEventListener("change", calculate)
-);
-
-calculate();
-];
+/*
+ FIREBASE SETUP:
+ 1. Create a Firebase project.
+ 2. Enable Authentication > Email/Password.
+ 3. Create a Firestore database.
+ 4. Replace the placeholder config below with your Firebase web app config.
+ 5. Set Firestore security rules so each signed-in user can access only
+    users/{their-own-uid}/quotes/{quoteId}.
+ Never paste a service-account private key into this public website.
+*/
+const FIREBASE_CONFIG = {
+  apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
+  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  appId: "PASTE_YOUR_FIREBASE_APP_ID"
+};
 
 const $ = id => document.getElementById(id);
-const money = n => "₹" + Math.round(n).toLocaleString("en-IN");
-const num = id => Math.max(0, Number($(id).value) || 0);
+const money = n => "₹" + Math.round(Number(n) || 0).toLocaleString("en-IN");
+const num = id => Math.max(0, Number($(id)?.value) || 0);
+
+const ids = [
+ "customer","phone","model","variant","state","quoteDate",
+ "ex","gst","gstIncluded","rto","insurance","warranty",
+ "accessories","other","discount","down","rate","years"
+];
+
+let firebaseReady = false;
+let auth = null;
+let db = null;
+let currentUser = null;
 
 function calculate() {
-  const ex = num("ex");
-  const rto = num("rto");
-  const insurance = num("insurance");
+ const ex = num("ex");
+ const rto = num("rto");
+ const insurance = num("insurance");
+ const warranty = num("warranty");
+ const accessories = num("accessories");
+ const other = num("other");
+ const discount = num("discount");
+ const gstRate = num("gst");
+ const gstIncluded = $("gstIncluded").value === "yes";
 
-  const warranty = num("warranty");
-  const accessories = num("accessories");
-  const other = num("other");
-  const discount = num("discount");
+ let gstAmount = 0;
+ let priceAfterGST = ex;
 
-  // GST calculation
-  const gstRate = num("gst");
-  const gstIncluded = $("gstIncluded").value === "yes";
-
-  let gstAmount = 0;
-  let priceAfterGST = ex;
-
-  if (gstRate > 0) {
-    if (gstIncluded) {
-      gstAmount = ex * gstRate / (100 + gstRate);
-    } else {
-      gstAmount = ex * gstRate / 100;
-      priceAfterGST = ex + gstAmount;
-    }
-  }
-
-  // Automatic on-road price
-  const extras = warranty + accessories + other;
-
-  const onroad = Math.max(
-    0,
-    priceAfterGST + rto + insurance + extras - discount
-  );
-
-  // Loan calculation
-  const down = Math.min(onroad, num("down"));
-  const loan = onroad - down;
-  const annualRate = num("rate") / 100;
-  const months = num("years") * 12;
-  const r = annualRate / 12;
-
-  let emi = 0;
-
-  if (loan > 0 && months > 0) {
-    emi = r === 0
-      ? loan / months
-      : loan * r * Math.pow(1 + r, months) /
-        (Math.pow(1 + r, months) - 1);
-  }
-
-  const repayment = emi * months;
-  const interest = Math.max(0, repayment - loan);
-
-  // Update every result automatically
-  $("showEx").textContent = money(ex);
-  $("showGST").textContent = money(gstAmount);
-  $("showRto").textContent = money(rto);
-  $("showInsurance").textContent = money(insurance);
-  $("showExtras").textContent = money(extras);
-  $("showDiscount").textContent = "-" + money(discount);
-
-  $("onroad").textContent = money(onroad);
-  $("loan").textContent = money(loan);
-  $("emi").textContent = money(emi);
-  $("interestTotal").textContent = money(interest);
-  $("repayment").textContent = money(repayment);
-
-  return {
-    ex, rto, insurance, extras, discount,
-    gstAmount, onroad, down, loan,
-    emi, interest, repayment
-  };
-}
-
-  $("showEx").textContent = money(ex);
-  $("showGST").textContent = money(gstAmount);
-  
-}
-  const ex = num("ex");
-const rto = num("rto");
-const insurance = num("insurance");
-const extras = num("warranty") + num("accessories") + num("other");
-const discount = num("discount");
-
-const gstRate = num("gst");
-const gstIncluded = $("gstIncluded").value === "yes";
-
-let gstAmount = 0;
-let priceAfterGST = ex;
-
-if (gstRate > 0) {
+ if (gstRate > 0) {
   if (gstIncluded) {
-    // GST already included: calculate the GST component
-    gstAmount = ex * gstRate / (100 + gstRate);
+   gstAmount = ex * gstRate / (100 + gstRate);
   } else {
-    // GST not included: add GST to the entered taxable price
-    gstAmount = ex * gstRate / 100;
-    priceAfterGST = ex + gstAmount;
+   gstAmount = ex * gstRate / 100;
+   priceAfterGST = ex + gstAmount;
   }
+ }
+
+ const extras = warranty + accessories + other;
+ const onroad = Math.max(0, priceAfterGST + rto + insurance + extras - discount);
+ const down = Math.min(onroad, num("down"));
+ const loan = Math.max(0, onroad - down);
+ const annualRate = num("rate") / 100;
+ const months = num("years") * 12;
+ const r = annualRate / 12;
+
+ let emi = 0;
+ if (loan > 0 && months > 0) {
+  emi = r === 0
+   ? loan / months
+   : loan * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1);
+ }
+
+ const repayment = emi * months;
+ const interest = Math.max(0, repayment - loan);
+
+ $("showEx").textContent = money(ex);
+ $("showGST").textContent = money(gstAmount);
+ $("showRto").textContent = money(rto);
+ $("showInsurance").textContent = money(insurance);
+ $("showExtras").textContent = money(extras);
+ $("showDiscount").textContent = "−" + money(discount);
+ $("onroad").textContent = money(onroad);
+ $("loan").textContent = money(loan);
+ $("emi").textContent = money(emi);
+ $("interestTotal").textContent = money(interest);
+ $("repayment").textContent = money(repayment);
+
+ return {
+  ex,gstAmount,rto,insurance,extras,discount,
+  onroad,down,loan,emi,interest,repayment,months
+ };
 }
 
-const onroad = Math.max(
-  0,
-  priceAfterGST + rto + insurance + extras - discount
-);
+function quoteData() {
+ const c = calculate();
+ return {
+  id: (globalThis.crypto && crypto.randomUUID)
+   ? crypto.randomUUID() : String(Date.now()),
+  createdAt: new Date().toISOString(),
+  customer: $("customer").value.trim(),
+  phone: $("phone").value.trim(),
+  model: $("model").value,
+  variant: $("variant").value.trim(),
+  state: $("state").value,
+  quoteDate: $("quoteDate").value,
+  ...c,
+  rate: num("rate"),
+  years: num("years")
+ };
+}
 
-  const onroad = Math.max(0, ex + rto + insurance + extras - discount);
-  const down = Math.min(onroad, num("down"));
-  const loan = onroad - down;
-  const annualRate = num("rate") / 100;
-  const months = num("years") * 12;
-  const r = annualRate / 12;
+function getLocalQuotes() {
+ try {
+  return JSON.parse(localStorage.getItem("titanexQuotes") || "[]");
+ } catch (e) {
+  return [];
+ }
+}
 
-  let emi = 0;
-  if(loan > 0 && months > 0){
-    emi = r === 0 ? loan / months :
-      loan * r * Math.pow(1+r, months) /
-      (Math.pow(1+r, months)-1);
+function setLocalQuotes(quotes) {
+ localStorage.setItem("titanexQuotes", JSON.stringify(quotes));
+}
+
+function setStatus(message) {
+ $("status").textContent = message;
+}
+
+function renderHistory() {
+ const list = getLocalQuotes();
+ const box = $("history");
+
+ if (!list.length) {
+  box.innerHTML = '<p class="hint">No saved quotes yet.</p>';
+  return;
+ }
+
+ box.innerHTML = "";
+
+ list.slice().reverse().forEach(q => {
+  const item = document.createElement("div");
+  item.className = "quote-item";
+
+  const line = document.createElement("div");
+  line.className = "line";
+
+  const title = document.createElement("strong");
+  title.textContent = (q.customer || "Customer") + " · " +
+   (q.model || "Car") + (q.variant ? " " + q.variant : "");
+
+  const price = document.createElement("strong");
+  price.textContent = money(q.onroad);
+
+  line.append(title, price);
+
+  const p = document.createElement("p");
+  p.textContent = new Date(q.createdAt).toLocaleString() +
+   " · EMI " + money(q.emi) + (q.phone ? " · " + q.phone : "");
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+
+  const load = document.createElement("button");
+  load.type = "button";
+  load.className = "secondary";
+  load.textContent = "Load";
+  load.addEventListener("click", () => loadQuote(q));
+
+  const share = document.createElement("button");
+  share.type = "button";
+  share.className = "secondary";
+  share.textContent = "Share";
+  share.addEventListener("click", () => shareQuote(q));
+
+  actions.append(load, share);
+  item.append(line, p, actions);
+  box.append(item);
+ });
+}
+
+function loadQuote(q) {
+ const map = {
+  customer:"customer", phone:"phone", model:"model", variant:"variant",
+  state:"state", quoteDate:"quoteDate", ex:"ex", gst:"gst",
+  rto:"rto", insurance:"insurance", warranty:"warranty",
+  accessories:"accessories", other:"other", discount:"discount",
+  down:"down", rate:"rate", years:"years"
+ };
+
+ Object.entries(map).forEach(([key, id]) => {
+  if (q[key] !== undefined) $(id).value = q[key];
+ });
+
+ calculate();
+ setStatus("Saved quote loaded.");
+ window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function messageFor(q) {
+ return `TITANEX CAR QUOTATION
+Customer: ${q.customer || "-"}
+Phone: ${q.phone || "-"}
+Car: ${(q.model || "-")} ${q.variant || ""}
+Location: ${q.state || "-"}
+Ex-showroom: ${money(q.ex)}
+GST amount: ${money(q.gstAmount)}
+RTO: ${money(q.rto)}
+Insurance: ${money(q.insurance)}
+Other extras: ${money(q.extras)}
+Discount: -${money(q.discount)}
+ON-ROAD PRICE: ${money(q.onroad)}
+Down payment: ${money(q.down)}
+Loan amount: ${money(q.loan)}
+Interest rate: ${q.rate}% · Tenure: ${q.years} years
+Estimated EMI: ${money(q.emi)}
+Total interest: ${money(q.interest)}
+Total repayment: ${money(q.repayment)}
+
+Estimate only. Verify final prices, fees, insurance and loan terms.`;
+}
+
+function shareQuote(q) {
+ window.open("https://wa.me/?text=" + encodeURIComponent(messageFor(q)), "_blank");
+}
+
+$("saveQuote").addEventListener("click", async () => {
+ const q = quoteData();
+
+ if (!q.customer && !q.phone) {
+  setStatus("Enter customer name or phone before saving.");
+  return;
+ }
+
+ try {
+  const list = getLocalQuotes();
+  list.push(q);
+  setLocalQuotes(list);
+  renderHistory();
+
+  if (firebaseReady && currentUser && db) {
+   const safe = {...q};
+   delete safe.id;
+   await db.collection("users").doc(currentUser.uid)
+    .collection("quotes").doc(q.id).set(safe);
+   setStatus("Quote saved in this browser and your Firebase account.");
+  } else {
+   setStatus("Quote saved in this browser. Configure Firebase for cloud saving.");
   }
+ } catch (e) {
+  setStatus("Could not save quote: " + e.message);
+ }
+});
 
-  const repayment = emi * months;
-  const interest = Math.max(0, repayment - loan);
+$("whatsapp").addEventListener("click", () => shareQuote(quoteData()));
+$("print").addEventListener("click", () => window.print());
 
-  $("showEx").textContent = money(ex);
-  $("showRto").textContent = money(rto);
-  $("showInsurance").textContent = money(insurance);
-  $("showExtras").textContent = money(extras);
-  $("showDiscount").textContent = "−" + money(discount);
-  $("onroad").textContent = money(onroad);
-  $("loan").textContent = money(loan);
-  $("emi").textContent = money(emi);
-  $("interestTotal").textContent = money(interest);
-  $("repayment").textContent = money(repayment);
+$("clearHistory").addEventListener("click", () => {
+ if (confirm("Delete all locally saved quotes on this browser?")) {
+  localStorage.removeItem("titanexQuotes");
+  renderHistory();
+  setStatus("Local quote history cleared.");
+ }
+});
 
-  return {ex,rto,insurance,extras,discount,onroad,down,loan,emi,interest,repayment};
-}
+$("authToggle").addEventListener("click", () => {
+ $("authCard").classList.toggle("hidden");
+ $("authCard").scrollIntoView({behavior:"smooth", block:"start"});
+});
 
-ids.forEach(id => $(id).addEventListener("input", calculate));
-  $("gstIncluded").addEventListener("change", calculate);
-ids.forEach(id => $(id).addEventListener("change", calculate));
+ids.forEach(id => {
+ const element = $(id);
+ if (element) {
+  element.addEventListener("input", calculate);
+  element.addEventListener("change", calculate);
+ }
+});
 
-function shareWhatsApp(){
-  const c = calculate();
-  const customer = $("customer").value.trim() || "Customer";
-  const message =
-`TITANEX - CAR PRICE QUOTATION
-Customer: ${customer}
-Model: ${$("model").value} ${$("variant").value}
-Registration State: ${$("state").value}
-
-Ex-showroom: ${money(c.ex)}
-RTO / Registration: ${money(c.rto)}
-Insurance: ${money(c.insurance)}
-Warranty + Accessories + Other: ${money(c.extras)}
-Discount: -${money(c.discount)}
-ON-ROAD PRICE: ${money(c.onroad)}
-
-Down Payment: ${money(c.down)}
-Loan Amount: ${money(c.loan)}
-Interest Rate: ${num("rate")}% p.a.
-Loan Tenure: ${$("years").value} years
-Estimated EMI: ${money(c.emi)}/month
-
-This is an estimate. Final prices, insurance and loan terms must be confirmed.`;
-
-  const phone = $("phone").value.replace(/\D/g,"");
-  const url = phone.length >= 10
-    ? "https://wa.me/" + phone + "?text=" + encodeURIComponent(message)
-    : "https://wa.me/?text=" + encodeURIComponent(message);
-
-  window.open(url, "_blank");
-}
-
+$("quoteDate").value = new Date().toISOString().slice(0,10);
+renderHistory();
 calculate();
-</script>
-</body>
-</html>
+
+function firebaseConfigReady() {
+ return FIREBASE_CONFIG.apiKey &&
+  !FIREBASE_CONFIG.apiKey.startsWith("PASTE_") &&
+  FIREBASE_CONFIG.projectId &&
+  !FIREBASE_CONFIG.projectId.startsWith("PASTE_") &&
+  FIREBASE_CONFIG.appId &&
+  !FIREBASE_CONFIG.appId.startsWith("PASTE_");
+}
+
+function loadFirebaseSdk() {
+ return new Promise((resolve, reject) => {
+  if (window.firebase) {
+   resolve();
+   return;
+  }
+
+  const urls =
