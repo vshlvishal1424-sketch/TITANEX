@@ -436,7 +436,79 @@ const $ = id => document.getElementById(id);
 const money = n => "₹" + Math.round(n).toLocaleString("en-IN");
 const num = id => Math.max(0, Number($(id).value) || 0);
 
-function calculate(){ function calculate(){
+function calculate() {
+  const ex = num("ex");
+  const rto = num("rto");
+  const insurance = num("insurance");
+
+  const warranty = num("warranty");
+  const accessories = num("accessories");
+  const other = num("other");
+  const discount = num("discount");
+
+  // GST calculation
+  const gstRate = num("gst");
+  const gstIncluded = $("gstIncluded").value === "yes";
+
+  let gstAmount = 0;
+  let priceAfterGST = ex;
+
+  if (gstRate > 0) {
+    if (gstIncluded) {
+      gstAmount = ex * gstRate / (100 + gstRate);
+    } else {
+      gstAmount = ex * gstRate / 100;
+      priceAfterGST = ex + gstAmount;
+    }
+  }
+
+  // Automatic on-road price
+  const extras = warranty + accessories + other;
+
+  const onroad = Math.max(
+    0,
+    priceAfterGST + rto + insurance + extras - discount
+  );
+
+  // Loan calculation
+  const down = Math.min(onroad, num("down"));
+  const loan = onroad - down;
+  const annualRate = num("rate") / 100;
+  const months = num("years") * 12;
+  const r = annualRate / 12;
+
+  let emi = 0;
+
+  if (loan > 0 && months > 0) {
+    emi = r === 0
+      ? loan / months
+      : loan * r * Math.pow(1 + r, months) /
+        (Math.pow(1 + r, months) - 1);
+  }
+
+  const repayment = emi * months;
+  const interest = Math.max(0, repayment - loan);
+
+  // Update every result automatically
+  $("showEx").textContent = money(ex);
+  $("showGST").textContent = money(gstAmount);
+  $("showRto").textContent = money(rto);
+  $("showInsurance").textContent = money(insurance);
+  $("showExtras").textContent = money(extras);
+  $("showDiscount").textContent = "-" + money(discount);
+
+  $("onroad").textContent = money(onroad);
+  $("loan").textContent = money(loan);
+  $("emi").textContent = money(emi);
+  $("interestTotal").textContent = money(interest);
+  $("repayment").textContent = money(repayment);
+
+  return {
+    ex, rto, insurance, extras, discount,
+    gstAmount, onroad, down, loan,
+    emi, interest, repayment
+  };
+}
 
   $("showEx").textContent = money(ex);
   $("showGST").textContent = money(gstAmount);
