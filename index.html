@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TITANEX | Smart Calculator</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090910;color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.app{width:100%;max-width:400px;background:#12121d;border:1px solid #29243e;border-radius:24px;padding:22px;box-shadow:0 0 35px #761dff22}
+.logo{font-size:30px;font-weight:900;letter-spacing:4px;text-align:center;color:#b88aff}
+.tag{text-align:center;color:#8d8a9e;font-size:11px;letter-spacing:2px;margin:8px 0 25px}
+.tabs{display:flex;gap:7px;margin-bottom:15px}
+.tabs button{flex:1;padding:11px 4px;border:0;border-radius:10px;background:#222233;color:#aaa;font-weight:bold}
+.tabs button.active{background:#8b35ff;color:white}
+.display{background:#08080e;border:1px solid #302448;border-radius:14px;padding:18px;margin-bottom:15px;text-align:right;min-height:95px;overflow-wrap:anywhere}
+#expression{color:#aaa;font-size:15px;min-height:22px}
+#result{font-size:34px;font-weight:bold;margin-top:8px}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.keys button{height:58px;border:0;border-radius:13px;background:#242437;color:white;font-size:20px;font-weight:bold}
+.keys button:active{transform:scale(.96)}
+.keys .op{background:#392356;color:#d5aaff}
+.keys .clear{background:#522235;color:#ff9ab5}
+.keys .equal{background:#8b35ff}
+.keys .zero{grid-column:span 2}
+.footer{text-align:center;color:#666277;font-size:11px;margin-top:20px}
+</style>
+</head>
+<body>
+<main class="app">
+<div class="logo">TITANEX</div>
+<div class="tag">CALCULATE BEYOND LIMITS</div>
+<div class="tabs">
+<button class="active" onclick="setMode('basic',this)">Basic</button>
+<button onclick="setMode('scientific',this)">Scientific</button>
+<button onclick="setMode('finance',this)">Finance</button>
+</div>
+<div class="display">
+<div id="expression">Ready to calculate</div>
+<div id="result">0</div>
+</div>
+<div class="keys" id="keys"></div>
+<div class="footer">TITANEX © 2026 · Smart calculations</div>
+</main>
+<script>
+let expr='',mode='basic',fresh=true;
+const result=document.getElementById('result');
+const expression=document.getElementById('expression');
+function setMode(m,btn){
+ mode=m;
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+ btn.classList.add('active');buildKeys();
+}
+function buildKeys(){
+ let items=mode==='basic'
+ ?['AC','DEL','%','÷','7','8','9','×','4','5','6','−','1','2','3','+','0','.','ANS','=']
+ :mode==='scientific'
+ ?['AC','DEL','%','÷','sin','cos','tan','×','7','8','9','−','4','5','6','+','1','2','3','=','0','.','√','π']
+ :['AC','DEL','%','÷','EMI','×','−','+','10%','15%','20%','25%','7','8','9','4','5','6','1','2','3','0','.','='];
+ document.getElementById('keys').innerHTML=items.map(k=>{
+ let cls=['÷','×','−','+','%','√','π','sin','cos','tan','EMI','10%','15%','20%','25%'].includes(k)?'op':'';
+ if(k==='AC')cls='clear';
+ if(k==='=')cls='equal';
+ if(k==='0')cls+=' zero';
+ return `<button class="${cls}" onclick="press('${k}')">${k}</button>`;
+ }).join('');
+}
+function press(k){
+ if(k==='AC'){expr='';fresh=true;expression.textContent='Ready to calculate';result.textContent='0';return}
+ if(k==='DEL'){expr=expr.slice(0,-1);showExpr();return}
+ if(k==='ANS'){expr=result.textContent;showExpr();return}
+ if(mode==='scientific'&&['sin','cos','tan','√','π'].includes(k)){
+ if(k==='π')expr+='Math.PI';
+ else if(k==='√')expr+='Math.sqrt(';
+ else expr+='Math.'+k+'(';
+ showExpr();return;
+ }
+ if(mode==='finance'&&['EMI','10%','15%','20%','25%'].includes(k)){
+ if(k==='EMI'){expression.textContent='EMI: enter a formula in the display';return}
+ expr+='*'+parseInt(k)/100;showExpr();return;
+ }
+ if(k==='='){calculate();return}
+ let map={'÷':'/','×':'*','−':'-'};
+ if(fresh&&/[0-9.]/.test(k)){expr='';fresh=false}
+ expr+=map[k]||k;showExpr();
+}
+function showExpr(){expression.textContent=expr||'Ready to calculate'}
+function calculate(){
+ try{
+ if(!expr||!/^[0-9+\-*/().%\sMathPI,sincotaqrg]+$/.test(expr))throw Error();
+ let safe=expr.replace(/(\d+(\.\d+)?)%/g,'($1/100)');
+ let ans=Function('"use strict";return ('+safe+')')();
+ if(typeof ans!=='number'||!Number.isFinite(ans))throw Error();
+ expression.textContent=expr+' =';
+ result.textContent=String(Number(ans.toPrecision(12)));
+ expr=String(Number(ans.toPrecision(12)));fresh=true;
+ }catch(e){result.textContent='Error';expression.textContent='Check your calculation';expr='';fresh=true}
+}
+buildKeys();
+</script>
+</body>
+</html>
