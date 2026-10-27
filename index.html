@@ -59,6 +59,55 @@ main{display:block;max-width:none;margin:0;padding:0}
 .emi{color:#111}
 input,select{background:white;color:#111;border-color:#ccc}
 }
+ #loginScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle at top right, #35165b, #0e0c18 60%);
+}
+
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  padding: 28px;
+  background: #19162b;
+  border: 1px solid #493766;
+  border-radius: 20px;
+  box-shadow: 0 15px 45px #0005;
+}
+
+.login-box h1 {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.login-box p {
+  text-align: center;
+  color: #bcb6d1;
+  margin-bottom: 24px;
+}
+
+.login-box .field {
+  margin-bottom: 15px;
+}
+
+.login-box button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+#loginMessage {
+  color: #ff9ba9;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+#appContent[hidden],
+#loginScreen[hidden] {
+  display: none !important;
+}
 </style>
 </head>
 <body>
